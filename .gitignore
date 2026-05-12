@@ -1,6 +1,5 @@
-```
-# Dependencies
-node_modules/
+# CI/CD
+.github/
 
 # Logs and temp files
 *.log
@@ -11,56 +10,48 @@ node_modules/
 .env.local
 .env.*
 
-# Editors
-.vscode/
-.idea/
+# Dependencies
+node_modules/
+__pycache__/
+.venv/
+venv/
+.mypy_cache/
+.pytest_cache/
+target/
+.gradle/
 
 # Build artifacts
 dist/
 build/
-target/
-
-# Python
-__pycache__/
 *.pyc
-*.pyo
-*.pyd
-.Python
-env/
-venv/
-.venv/
-pip-log.txt
-pip-delete-this-directory.txt
-.tox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.log
-.git/
-.mypy_cache/
-.pytest_cache/
-.hypothesis/
-
-# Compiled and binary files
+*.class
 *.o
-*.obj
+*.exe
+*.dll
 *.so
 *.a
-*.lib
-*.dll
-*.dylib
-*.exe
+*.obj
 *.out
-*.class
-*.jar
-*.war
-*.ear
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# System
+.DS_Store
+Thumbs.db
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
+
+# Compressed files
 *.zip
-*.tar
 *.gz
+*.tar
 *.tgz
 *.bz2
 *.xz
@@ -76,20 +67,7 @@ coverage.xml
 *.Z
 *.lz
 *.lzo
-
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-desktop.ini
-
-# IDE specific
-.vs/
-*.swp
-*.swo
-*~
-```
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
