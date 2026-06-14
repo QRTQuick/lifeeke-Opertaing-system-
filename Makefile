@@ -1,31 +1,49 @@
-AS      = nasm
-CC      = gcc
-LD      = ld
+CC = gcc
+AS = nasm
+LD = ld
 
-CFLAGS  = -m32 -ffreestanding -fno-pie -fno-stack-protector -Wall -Wextra -O2 -c
-LDFLAGS = -m elf_i386 -T linker.ld -nostdlib
+CFLAGS = -std=gnu99 -ffreestanding -O2 -Wall -Wextra -I.
+ASFLAGS = -f elf
+LDFLAGS = -T linker.ld
 
-all: os.iso
+BUILD_DIR = build
 
-boot.o: boot.asm
-	$(AS) -f elf32 boot.asm -o boot.o
+# Source files
+C_SRCS = kernel.c gdt.c idt.c vga.c io.c fs.c string.c users.c keyboard.c shell.c
+ASM_SRCS = boot.asm gdt.asm idt_handlers.asm
 
-kernel.o: kernel.c
-	$(CC) $(CFLAGS) kernel.c -o kernel.o
+# Object files
+C_OBJS = $(patsubst %.c, $(BUILD_DIR)/%.o, $(C_SRCS))
+ASM_OBJS = $(patsubst %.asm, $(BUILD_DIR)/%.o, $(ASM_SRCS))
 
-kernel.elf: boot.o kernel.o linker.ld
-	$(LD) $(LDFLAGS) boot.o kernel.o -o kernel.elf
+ALL_OBJS = $(C_OBJS) $(ASM_OBJS)
 
-os.iso: kernel.elf grub.cfg
+KERNEL_ELF = $(BUILD_DIR)/kernel.elf
+
+.PHONY: all clean run iso
+
+all: $(KERNEL_ELF)
+
+$(BUILD_DIR): 
+	mkdir -p $(BUILD_DIR)
+
+$(BUILD_DIR)/%.o: %.c | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/%.o: %.asm | $(BUILD_DIR)
+	$(AS) $(ASFLAGS) $< -o $@
+
+$(KERNEL_ELF): $(ALL_OBJS) linker.ld
+	$(LD) $(LDFLAGS) -o $@ $(ALL_OBJS)
+
+iso: $(KERNEL_ELF)
 	mkdir -p iso/boot/grub
-	cp kernel.elf iso/boot/kernel.elf
-	cp grub.cfg iso/boot/grub/grub.cfg
+	cp $(KERNEL_ELF) iso/boot/
+	cp grub.cfg iso/boot/grub/
 	grub-mkrescue -o os.iso iso
 
-check: kernel.elf
-	grub-file --is-x86-multiboot kernel.elf && echo "Multiboot header OK"
+run: iso
+	qemu-system-i386 -kernel $(KERNEL_ELF)
 
 clean:
-	rm -rf *.o *.elf iso os.iso
-
-.PHONY: all clean check
+	rm -rf $(BUILD_DIR) iso os.iso
