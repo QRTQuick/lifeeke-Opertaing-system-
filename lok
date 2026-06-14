@@ -1,2 +1,0 @@
-sudo apt update
-sudo apt install -y build-essential nasm gcc-multilib binutils grub-pc-bin grub-common xorriso mtools
